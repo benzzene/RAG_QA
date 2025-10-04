@@ -58,8 +58,6 @@ class FaissFlatStore(IndexStore):
 
     def __init__(self, dim: int, device: Device = "cpu", gpu_id: int = 0):
         """
-        Initialize a FAISS flat index store.
-
         Args:
             dim (int): Embedding dimensionality. Must be > 0.
                 This must match the embedding dimension of the vectors inserted into the index!

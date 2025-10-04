@@ -36,8 +36,6 @@ class RecursiveSplitter:
 
     def __init__(self, config: Optional[SplitterConfig] = None) -> None:
         """
-        Initialize a recursive splitter.
-
         Args:
             config (Optional[SplitterConfig], optional): Configuration object.
                 If None, default values are used.

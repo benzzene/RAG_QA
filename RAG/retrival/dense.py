@@ -14,8 +14,6 @@ class DenseSearch:
 
     def __init__(self, index: IndexStore = FaissFlatStore, embedder: Embeddings = HFEmbeddings):
         """
-        Initialize the dense search retriever.
-
         Args:
             index (IndexStore): Vector index implementing the IndexStore interface (e.g., FaissFlatStore). Used to store and search embeddings.
             embedder (Embeddings): Embedding model implementing the Embeddings interface (e.g., HFEmbeddings). Used to generate query embeddings.

@@ -34,8 +34,6 @@ class BM25:
 
     def __init__(self, chunks: List[Document]):
         """
-        Initialize BM25 retriever with pre-tokenized corpus.
-
         Args:
             chunks (List[Document]): List of LangChain Document objects
                 representing text chunks to index.

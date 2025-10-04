@@ -90,8 +90,6 @@ class DirectoryDocumentLoader:
     """
     def __init__(self, config: LoaderConfig, factory: Optional[FileLoaderFactory] = None) -> None:
         """
-        Initialize the directory loader.
-
         Args:
             config (LoaderConfig): Configuration object controlling loading behavior.
             factory (Optional[FileLoaderFactory], optional): Factory for creating

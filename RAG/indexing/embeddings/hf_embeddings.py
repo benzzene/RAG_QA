@@ -16,8 +16,6 @@ class HFEmbeddings(Embeddings):
         device: str | None = None,
     ):
         """
-        Initialize the embedding model.
-
         Args:
             model_name (str, optional): The Hugging Face model to load.
             normalize (bool, optional): Whether to L2-normalize embeddings.
