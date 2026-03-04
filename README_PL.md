@@ -1,11 +1,11 @@
 # RAG-QA
 
-Retrival-Augumented Generation QA System umożliwiający efektywne odpowiadanie na pytania w oparciu o dostarczoną bazę wiedzy. 
+Retrival-Augumented Generation QA System odpowiadający na pytania w oparciu o dostarczoną bazę wiedzy. 
 
 
 ## Requirements:
 **Wymagania sprzętowe**
-Minimum do swobodnego korzystania z systemy: GPU z 24GB VRAM i 16GB pamięci RAM. 
+Minimum do swobodnego korzystania z systemu: GPU z 24GB VRAM i 16GB pamięci RAM. 
 System działa również na CPU, wtedy zalecane jest 32GB RAM.
 
 
@@ -19,10 +19,10 @@ System działa również na CPU, wtedy zalecane jest 32GB RAM.
 
 
 ## Quick Start
-W archiwum `.zip` znajduje się kod źródłowy systemu RAG.
+Pobierz kod źródłowy do archiwum `.zip` 
 
 #### Windows
-1. Rozpakuj archiwum `rag_project.zip`.  
+1. Rozpakuj archiwum `RAQ_QA.zip`.  
 2. Przejdź do katalogu projektu:  
    ```powershell
    cd ścieżka_do_rozpakowanego_rag_project
@@ -30,7 +30,7 @@ W archiwum `.zip` znajduje się kod źródłowy systemu RAG.
    python -m RAG.pipeline
 
 #### Linux
-1. Rozpakuj archiwum `rag_project.zip`.  
+1. Rozpakuj archiwum `RAQ_QA.zip`.  
 2. Przejdź do katalogu projektu:
    ```bash
    cd ścieżka_do_rozpakowanego_rag_project
