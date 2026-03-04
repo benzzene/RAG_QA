@@ -87,17 +87,111 @@ cd path_to_extracted_rag_project
 pip install -r requirements.txt \
 && python -m RAG.pipeline
 ```
+---
 
-### ⚠️ Note
+# ⚙️ Pipeline Architecture
 
-The project **currently does not include a graphical user interface (GUI)**.
+The entire system runs **locally**, including embedding generation, retrieval, reranking, and LLM inference.
 
-If you want to modify:
+### Architecture Diagram
 
-* **Queries** → edit them directly in `pipeline.py`
-* **Knowledge base** → modify the files inside the `docs/` directory
+```mermaid
+flowchart LR
 
-This will be **improved in future versions** to allow easier configuration and interaction.
+A[Documents / Knowledge Base] --> B[Text Splitter<br>RecursiveCharacterTextSplitter]
+
+B --> C[Embeddings<br>BGE-M3]
+
+C --> D[Vector Index<br>FAISS]
+
+E[User Query] --> F[Hybrid Retriever<br>BM25 + Dense Search]
+
+D --> F
+
+F --> G[Reranker<br>bge-reranker-v2-m3]
+
+G --> H[Local LLM<br>Qwen2.5-7B-Instruct]
+
+H --> I[Final Answer<br>+ Sources]
+```
+
+---
+
+## 📄 Splitter
+
+**RecursiveCharacterTextSplitter (LangChain)**
+
+Splits text using natural boundaries:
+
+* paragraphs
+* sentences
+* phrases
+* characters (fallback)
+
+Benefits:
+
+* preserves **semantic coherence**
+* reduces **context loss**
+* improves retrieval quality
+
+---
+
+## 🧬 Embedder
+
+**BGE-M3**
+
+State-of-the-art multilingual embedding model.
+
+https://arxiv.org/pdf/2402.03216
+
+---
+
+## 📦 Index Store
+
+**FAISS**
+
+Facebook AI library for **Approximate Nearest Neighbor search**.
+
+https://arxiv.org/pdf/2401.08281
+
+---
+
+## 🔎 Retriever
+
+Hybrid retrieval:
+
+* **BM25 (sparse retrieval)**
+* **Dense vector retrieval**
+
+Fusion method:
+
+**Reciprocal Rank Fusion (RRF)**
+
+BM25 paper
+https://www.staff.city.ac.uk/~sbrp622/papers/foundations_bm25_review.pdf
+
+RRF paper
+https://cormack.uwaterloo.ca/cormacksigir09-rrf.pdf
+
+---
+
+## 🎯 Reranker
+
+**bge-reranker-v2-m3**
+
+https://huggingface.co/BAAI/bge-reranker-v2-m3
+
+Improves retrieval quality by re-ranking candidate documents.
+
+---
+
+## 🤖 LLM
+
+**Qwen2.5-7B-Instruct**
+
+Used for **local answer generation**.
+
+https://arxiv.org/pdf/2409.12186
 
 ---
 
@@ -243,106 +337,14 @@ docs\pllum.txt | chunk: 125
 
 ---
 
-# ⚙️ Pipeline Architecture
+### ⚠️ Current Limitations
 
-The entire system runs **locally**, including embedding generation, retrieval, reranking, and LLM inference.
+The project **currently does not include a graphical user interface (GUI)**.
 
-### Architecture Diagram
+If you want to modify:
 
-```mermaid
-flowchart LR
+* **Queries** → edit them directly in `pipeline.py`
+* **Knowledge base** → modify the files inside the `docs/` directory
 
-A[Documents / Knowledge Base] --> B[Text Splitter<br>RecursiveCharacterTextSplitter]
+This will be **improved in future versions** to allow easier configuration and interaction.
 
-B --> C[Embeddings<br>BGE-M3]
-
-C --> D[Vector Index<br>FAISS]
-
-E[User Query] --> F[Hybrid Retriever<br>BM25 + Dense Search]
-
-D --> F
-
-F --> G[Reranker<br>bge-reranker-v2-m3]
-
-G --> H[Local LLM<br>Qwen2.5-7B-Instruct]
-
-H --> I[Final Answer<br>+ Sources]
-```
-
----
-
-## 📄 Splitter
-
-**RecursiveCharacterTextSplitter (LangChain)**
-
-Splits text using natural boundaries:
-
-* paragraphs
-* sentences
-* phrases
-* characters (fallback)
-
-Benefits:
-
-* preserves **semantic coherence**
-* reduces **context loss**
-* improves retrieval quality
-
----
-
-## 🧬 Embedder
-
-**BGE-M3**
-
-State-of-the-art multilingual embedding model.
-
-https://arxiv.org/pdf/2402.03216
-
----
-
-## 📦 Index Store
-
-**FAISS**
-
-Facebook AI library for **Approximate Nearest Neighbor search**.
-
-https://arxiv.org/pdf/2401.08281
-
----
-
-## 🔎 Retriever
-
-Hybrid retrieval:
-
-* **BM25 (sparse retrieval)**
-* **Dense vector retrieval**
-
-Fusion method:
-
-**Reciprocal Rank Fusion (RRF)**
-
-BM25 paper
-https://www.staff.city.ac.uk/~sbrp622/papers/foundations_bm25_review.pdf
-
-RRF paper
-https://cormack.uwaterloo.ca/cormacksigir09-rrf.pdf
-
----
-
-## 🎯 Reranker
-
-**bge-reranker-v2-m3**
-
-https://huggingface.co/BAAI/bge-reranker-v2-m3
-
-Improves retrieval quality by re-ranking candidate documents.
-
----
-
-## 🤖 LLM
-
-**Qwen2.5-7B-Instruct**
-
-Used for **local answer generation**.
-
-https://arxiv.org/pdf/2409.12186
