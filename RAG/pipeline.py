@@ -17,4 +17,3 @@ if __name__ == "__main__":
         for c in o["contexts"]:
             src = c["meta"].get("source") or c["meta"].get("source_path")
             print("-", src, "| chunk:", c["meta"].get("chunk_id"))
-
