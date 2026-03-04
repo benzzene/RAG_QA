@@ -1,50 +1,72 @@
-# RAG-QA
+# 🧠 RAG-QA
 
-A Retrieval-Augmented Generation QA system that enables efficient question answering based on a provided knowledge base.
+A **local Retrieval-Augmented Generation (RAG)** question answering system that enables efficient answers based on a custom knowledge base.
+
+The entire pipeline — including the **LLM, embeddings, and retrieval system — runs locally on your machine**.
+
+✅ **No external APIs**
+✅ **No cloud dependencies**
+✅ **Your data never leaves your system**
+
+This makes the project suitable for:
+
+* privacy-sensitive environments
+* offline usage
+* research and experimentation with local LLM pipelines
 
 ---
 
-# Requirements
+# 🚀 Quick Overview
 
-## Hardware Requirements
+**Main capabilities**
 
-Minimum recommended configuration for smooth usage:
+* 🧠 **Fully local LLM inference**
+* 📚 Retrieval-Augmented Generation (RAG)
+* 🔎 Hybrid retrieval (**BM25 + embeddings**)
+* 📑 Answer generation with **source citations**
+* ⚡ Optimized vector search using **FAISS**
+* 🎯 Retrieval quality improved with **reranking**
+* 🔒 **Private and offline by design**
 
-- GPU with **24 GB VRAM**
-- **16 GB RAM**
-
-The system can also run on **CPU**, but in that case **32 GB RAM** is recommended.
+All components operate **entirely on the user's machine**.
 
 ---
 
-## Dependencies
+# 💻 Requirements
 
-### GPU
+## Hardware
 
-If you want to use a GPU, you need to install **PyTorch with CUDA support**.
+Recommended minimal configuration for smooth performance:
 
-1. Check your CUDA version:
+| Component | Recommended               |
+| --------- | ------------------------- |
+| GPU       | **24 GB VRAM**            |
+| RAM       | **16 GB RAM**             |
+| CPU mode  | **32 GB RAM recommended** |
 
-```bash
-nvidia-smi
-````
+The system **can run entirely on CPU**, but GPU acceleration significantly improves performance.
 
-2. Install **PyTorch + CUDA**:
+Since the **LLM runs locally**, hardware resources determine performance.
 
-```bash
-pip install torch --index-url https://download.pytorch.org/whl/cuXXX
+---
+
+# ⚡ Quick Start
+
+Download the project archive:
+
+```text
+RAG_QA.zip
 ```
 
+Extract it and follow the instructions for your platform.
+
 ---
 
-# Quick Start
+## 🪟 Windows
 
-Download the `.zip` archive containing the source code of the RAG system.
-
-## Windows
-
-1. Extract the archive `RAG_QA.zip`.
-2. Navigate to the project directory:
+1. Extract the archive
+2. Open **PowerShell**
+3. Navigate to the project directory
 
 ```powershell
 cd path_to_extracted_rag_project
@@ -54,10 +76,11 @@ python -m RAG.pipeline
 
 ---
 
-## Linux
+## 🐧 Linux
 
-1. Extract the archive `RAG_QA.zip`.
-2. Navigate to the project directory:
+1. Extract the archive
+2. Open terminal
+3. Navigate to the project directory
 
 ```bash
 cd path_to_extracted_rag_project
@@ -65,25 +88,39 @@ pip install -r requirements.txt \
 && python -m RAG.pipeline
 ```
 
+### ⚠️ Note
+
+The project **currently does not include a graphical user interface (GUI)**.
+
+If you want to modify:
+
+* **Queries** → edit them directly in `pipeline.py`
+* **Knowledge base** → modify the files inside the `docs/` directory
+
+This will be **improved in future versions** to allow easier configuration and interaction.
+
 ---
 
-# Example Answers
+# 🧪 Example Questions & Answers
 
-## 1. What LLaMA models are available?
+Below are sample queries demonstrating the capabilities of the system.
 
-Available LLaMA models include:
+---
 
-* **LLaMA 1 (2023)** – variants 7B, 13B, and 65B
-* **LLaMA 2 (July 2023)** – models 7B, 13B, and 70B
-* **LLaMA 3 (April 2024)** – models 8B and 70B
-* **LLaMA 3.2 (September 2024)** – text models 1B, 3B, and Llama 3.2-Vision 11B and 90B
-* **LLaMA 4 (April 2025)** – models Scout, Maverick, and Behemoth (MoE architecture)
+## 1️⃣ What LLaMA models are available?
 
-All models are distributed under the **Llama Community License**, except for organizations with more than **700 million monthly active users**, which must obtain additional permission.
+Available **LLaMA** models include:
+
+* **LLaMA 1 (2023)** – 7B, 13B, 65B
+* **LLaMA 2 (July 2023)** – 7B, 13B, 70B
+* **LLaMA 3 (April 2024)** – 8B, 70B
+* **LLaMA 3.2 (September 2024)** – 1B, 3B and Vision 11B, 90B
+* **LLaMA 4 (April 2025)** – Scout, Maverick, Behemoth (MoE)
+
+All models are distributed under the **Llama Community License**.
 
 ```
 === SOURCES ===
-
 docs\llama.txt | chunk: 56
 docs\llama.txt | chunk: 27
 docs\llama.txt | chunk: 29
@@ -98,24 +135,24 @@ docs\pllum.txt | chunk: 122
 
 ---
 
-## 2. Who created PLLuM?
+## 2️⃣ Who created PLLuM?
 
-The creators of **PLLuM** are a consortium of Polish universities and research institutes coordinated by **Wrocław University of Science and Technology**.
+The creators of **PLLuM** are a consortium of Polish universities and research institutes coordinated by:
 
-The project is supported by, among others:
+**Wrocław University of Science and Technology**
+
+Participating institutions include:
 
 * NASK PIB
-* Institute of Computer Science of the Polish Academy of Sciences
+* Institute of Computer Science — Polish Academy of Sciences
 * National Information Processing Institute (OPI PIB)
 * University of Łódź
-* Institute of Slavic Studies of the Polish Academy of Sciences
+* Institute of Slavic Studies — Polish Academy of Sciences
 
 ```
 === SOURCES ===
-
 docs\pllum.txt | chunk: 108
 docs\pllum.txt | chunk: 109
-docs\pllum.txt | chunk: 129
 docs\pllum.txt | chunk: 129
 docs\pllum.txt | chunk: 124
 docs\pllum.txt | chunk: 125
@@ -127,22 +164,21 @@ docs\pllum.txt | chunk: 117
 
 ---
 
-## 3. Which model works best on a GPU with 24 GB VRAM?
+## 3️⃣ Which model works best on a GPU with 24 GB VRAM?
 
-Based on the provided context:
+Suitable models include:
 
-* **LLaMA 13B** with **4-bit quantization**
-* **Ministral 3B**
+**LLaMA 13B (4-bit quantization)**
 
-can run on a GPU with **24 GB VRAM**.
+* ~24 GB VRAM without quantization
+* ~6 GB VRAM with 4-bit quantization
 
-The **LLaMA 13B** model requires approximately **24 GB VRAM without quantization**, but with **4-bit quantization** it can run on GPUs with as little as **6 GB VRAM**.
+**Ministral 3B**
 
-The **Ministral 3B** model requires a minimum of **8 GB VRAM**, so it also fits within the **24 GB VRAM** limit.
+* ~8 GB VRAM requirement
 
 ```
 === SOURCES ===
-
 docs\llama.txt | chunk: 32
 docs\llama.txt | chunk: 25
 docs\mistal.txt | chunk: 79
@@ -157,32 +193,25 @@ docs\mistal.txt | chunk: 95
 
 ---
 
-## 4. Which models from the PLLuM and LLaMA families support at least 128k context tokens and can be used commercially?
+## 4️⃣ Models supporting ≥128k context tokens and commercial usage
 
-Models meeting these conditions include:
+**PLLuM-12B**
 
-1. **PLLuM-12B**
+* 128k token context
+* commercial version available (without `nc`)
 
-   * supports **128k token context**
-   * available in a commercial version (without the **"nc"** suffix)
+**LLaMA 3.1**
 
-2. **LLaMA 3.1**
-
-   * variants **8B, 70B, 405B**
-   * support **128k token context**
-   * versions without **"nc"** can be used commercially
-
-Additionally:
-
-* **LLaMA 3.2 (1B and 3B)** also support **128k tokens**, but they are not mentioned as commercially available in this context.
+* 8B
+* 70B
+* 405B
+* 128k token context
 
 ```
 === SOURCES ===
-
 docs\llama.txt | chunk: 58
 docs\pllum.txt | chunk: 115
 docs\llama.txt | chunk: 38
-docs\pllum.txt | chunk: 129
 docs\pllum.txt | chunk: 129
 docs\llama.txt | chunk: 35
 docs\pllum.txt | chunk: 117
@@ -193,16 +222,14 @@ docs\llama.txt | chunk: 42
 
 ---
 
-## 5. Does PLLuM-12B have a built-in text-to-image generation module?
+## 5️⃣ Does PLLuM-12B support text-to-image generation?
 
-**This question checks whether the system will hallucinate — there is no information in the knowledge base about image generation capabilities of PLLuM.**
+This question tests **hallucination resistance**.
 
-In the provided context, there is **no information** about a built-in text-to-image generation module in **PLLuM-12B**.
+There is **no information in the knowledge base** indicating that PLLuM-12B contains a text-to-image module.
 
 ```
 === SOURCES ===
-
-docs\pllum.txt | chunk: 129
 docs\pllum.txt | chunk: 129
 docs\pllum.txt | chunk: 122
 docs\pllum.txt | chunk: 115
@@ -216,86 +243,106 @@ docs\pllum.txt | chunk: 125
 
 ---
 
-# Pipeline & Features
+# ⚙️ Pipeline Architecture
 
-## Splitter
+The entire system runs **locally**, including embedding generation, retrieval, reranking, and LLM inference.
+
+### Architecture Diagram
+
+```mermaid
+flowchart LR
+
+A[Documents / Knowledge Base] --> B[Text Splitter<br>RecursiveCharacterTextSplitter]
+
+B --> C[Embeddings<br>BGE-M3]
+
+C --> D[Vector Index<br>FAISS]
+
+E[User Query] --> F[Hybrid Retriever<br>BM25 + Dense Search]
+
+D --> F
+
+F --> G[Reranker<br>bge-reranker-v2-m3]
+
+G --> H[Local LLM<br>Qwen2.5-7B-Instruct]
+
+H --> I[Final Answer<br>+ Sources]
+```
+
+---
+
+## 📄 Splitter
 
 **RecursiveCharacterTextSplitter (LangChain)**
 
-Unlike simple fixed-length splitting, this algorithm tries to split text at natural boundaries first:
+Splits text using natural boundaries:
 
 * paragraphs
 * sentences
 * phrases
+* characters (fallback)
 
-Only as a last resort does it split at the character level.
+Benefits:
 
-This ensures that each **chunk preserves semantic coherence**, which:
-
-* reduces the risk of losing context
-* improves retrieval accuracy
+* preserves **semantic coherence**
+* reduces **context loss**
+* improves retrieval quality
 
 ---
 
-## Embedder
+## 🧬 Embedder
 
-**BGE-M3** – state-of-the-art embedding model.
+**BGE-M3**
+
+State-of-the-art multilingual embedding model.
 
 https://arxiv.org/pdf/2402.03216
 
-Available on **HuggingFace**.
-
 ---
 
-## Index Store
+## 📦 Index Store
 
-**FAISS** – a highly optimized Facebook AI library for **Approximate Nearest Neighbor (ANN)** search.
+**FAISS**
+
+Facebook AI library for **Approximate Nearest Neighbor search**.
 
 https://arxiv.org/pdf/2401.08281
 
 ---
 
-## Retriever
+## 🔎 Retriever
 
-A **hybrid retriever** combining:
+Hybrid retrieval:
 
-* **Sparse search (BM25)**
-* **Dense search (embedding-based retrieval)**
+* **BM25 (sparse retrieval)**
+* **Dense vector retrieval**
 
-using **Reciprocal Rank Fusion (RRF)**.
+Fusion method:
 
-Publications:
+**Reciprocal Rank Fusion (RRF)**
 
-BM25
+BM25 paper
 https://www.staff.city.ac.uk/~sbrp622/papers/foundations_bm25_review.pdf
 
-RRF
+RRF paper
 https://cormack.uwaterloo.ca/cormacksigir09-rrf.pdf
-
-This hybrid approach significantly improves:
-
-* **Recall@10**
-* **MAP@10**
-
-https://arxiv.org/html/2502.16767v1
 
 ---
 
-## Reranker
+## 🎯 Reranker
 
-**Cross-Encoder bge-reranker-v2-m3**
+**bge-reranker-v2-m3**
 
 https://huggingface.co/BAAI/bge-reranker-v2-m3
 
-Significantly improves retrieval quality by re-ranking candidate results.
+Improves retrieval quality by re-ranking candidate documents.
 
 ---
 
-## LLM
+## 🤖 LLM
 
 **Qwen2.5-7B-Instruct**
 
-https://arxiv.org/pdf/2409.12186
+Used for **local answer generation**.
 
-```
-```
+https://arxiv.org/pdf/2409.12186
