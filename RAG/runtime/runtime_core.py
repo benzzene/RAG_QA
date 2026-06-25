@@ -1,43 +1,66 @@
-# RAG_QA/RAG/runtime_core.py
 from __future__ import annotations
 
-from typing import List, Dict, Any
+import json
+from pathlib import Path
+from typing import Any, Dict, List
 
+from langchain_core.documents import Document
+
+from RAG.config import AppConfig, RuntimeConfig
+from RAG.indexing.build_index import build_index
 from RAG.indexing.embeddings.embeddings_factory import create_embeddings
-from RAG.indexing.vector_store.IndexStore_factory import create_indexstore
-
-from RAG.io.loaders import DirectoryDocumentLoader, LoaderConfig
-from RAG.io.splitters import RecursiveSplitter, SplitterConfig
-
-from RAG.retrival.retriver import Retriever, Retrieved
+from RAG.indexing.vector_store.faiss_index import FaissFlatStore
+from RAG.models.model_factory import make_model
+from RAG.reranker.cross_encoder import CrossEncoderReranker
 from RAG.retrival.bm25 import BM25
 from RAG.retrival.dense import DenseSearch
+from RAG.retrival.retriver import Retrieved, Retriever
 from RAG.retrival.rrf import RRF
 
-from RAG.reranker.cross_encoder import CrossEncoderReranker
-from RAG.models.model_factory import make_model
+
+def ensure_index_assets(cfg: AppConfig) -> None:
+    index_path = Path(cfg.runtime.index_path)
+    chunks_path = Path(cfg.runtime.chunks_path)
+
+    if index_path.exists() and chunks_path.exists():
+        return
+
+    if not cfg.runtime.build_if_missing:
+        raise FileNotFoundError(
+            f"Missing runtime assets: {index_path} or {chunks_path}. "
+            "Enable runtime.build_if_missing or build the index first."
+        )
+
+    build_index(cfg.index)
 
 
-def load_runtime():
+def load_chunks(path: Path) -> List[Document]:
+    chunks: List[Document] = []
+    with path.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            row = json.loads(line)
+            chunks.append(
+                Document(
+                    page_content=row["page_content"],
+                    metadata=row["metadata"],
+                )
+            )
+    return chunks
+
+
+def make_runtime(cfg: RuntimeConfig):
     embeddings = create_embeddings(
-        {"provider": "hf", "device": "cuda", "model": "BAAI/bge-m3", "normalize": True}
+        {
+            "provider": cfg.embeddings.provider,
+            "device": cfg.embeddings.device,
+            "model": cfg.embeddings.model,
+            "normalize": cfg.embeddings.normalize,
+            "batch_size": cfg.embeddings.batch_size,
+            "similarity_metric": cfg.embeddings.similarity_metric,
+        }
     )
-    store = create_indexstore({"provider": "faiss_flat", "device": "cpu"}, embedder=embeddings)
-    store.load(path="data/index.faiss")
-
-    cfg = LoaderConfig(root_dir="docs")
-    loader = DirectoryDocumentLoader(cfg)
-    raw_docs = loader.load()
-
-    cfg_split = SplitterConfig(chunk_size=1000, chunk_overlap=200)
-    splitter = RecursiveSplitter(cfg_split)
-    chunks = splitter.split(raw_docs)
-
-    return embeddings, store, chunks
-
-
-def make_runtime():
-    embeddings, store, chunks = load_runtime()
+    store = FaissFlatStore.load(cfg.index_path)
+    chunks = load_chunks(Path(cfg.chunks_path))
 
     bm25 = BM25(chunks)
     dense = DenseSearch(index=store, embedder=embeddings)
@@ -48,47 +71,49 @@ def make_runtime():
         dense=dense,
         rrf=rrf,
         chunks=chunks,
-        k_bm25=60,
-        k_dense=60,
-        topn=40,
+        k_bm25=cfg.retriever.k_bm25,
+        k_dense=cfg.retriever.k_dense,
+        topn=cfg.retriever.topn,
     )
 
     reranker = CrossEncoderReranker(
-        model_name="BAAI/bge-reranker-v2-m3",
-        device="cuda",
-        max_length=512,
+        model_name=cfg.reranker.model_name,
+        device=cfg.reranker.device,
+        max_length=cfg.reranker.max_length,
     )
 
     qwen = make_model(
         {
-            "provider": "qwen",
-            "model_id": "Qwen/Qwen2.5-7B-Instruct",
-            "device": "cuda",
-            "use_4bit": True,
-            "system_prompt": (
-                "Jesteś asystentem QA. Odpowiadasz WYŁĄCZNIE na podstawie przekazanego kontekstu."
-                "Twoim zadaniem jest wydobyć informację z kontekstu, nawet jeżeli są rozproszone. "
-                "Cytuj źródła, gdy to możliwe."
-            ),
-            "max_context_chars": 12000,
-            "max_new_tokens": 512,
-            "temperature": 0.2,
-            "top_p": 0.9,
-            "do_sample": True,
-            "repetition_penalty": 1.1,
+            "provider": cfg.llm.provider,
+            "model_id": cfg.llm.model_id,
+            "device": cfg.llm.device,
+            "use_4bit": cfg.llm.use_4bit,
+            "system_prompt": cfg.llm.system_prompt,
+            "max_context_chars": cfg.llm.max_context_chars,
+            "max_new_tokens": cfg.llm.max_new_tokens,
+            "temperature": cfg.llm.temperature,
+            "top_p": cfg.llm.top_p,
+            "do_sample": cfg.llm.do_sample,
+            "repetition_penalty": cfg.llm.repetition_penalty,
         }
     )
 
     return retriever, reranker, qwen
 
-
-def run_queries(queries: List[str]) -> List[Dict[str, Any]]:
-    retriever, reranker, qwen = make_runtime()
+def run_queries(queries: List[str], cfg: AppConfig) -> List[Dict[str, Any]]:
+    """Deprecated, use RAGService"""
+    ensure_index_assets(cfg)
+    retriever, reranker, qwen = make_runtime(cfg.runtime)
     results: List[Dict[str, Any]] = []
 
     for q in queries:
         candidates: List[Retrieved] = retriever.retrieve(q)
-        reranked: List[Retrieved] = reranker.rerank(q, candidates, k_final=10, batch_size=32)
+        reranked: List[Retrieved] = reranker.rerank(
+            q,
+            candidates,
+            k_final=cfg.runtime.reranker.k_final,
+            batch_size=cfg.runtime.reranker.batch_size,
+        )
         ctxs = [{"text": r.text, "meta": r.meta, "score": r.score} for r in reranked]
         out = qwen.answer_from_contexts(q, ctxs)
         results.append(out)

@@ -60,6 +60,8 @@ RAG_QA.zip
 
 Extract it and follow the instructions for your platform.
 
+If you use NVIDIA GPU, install the appropriate PyTorch version for your CUDA toolkit: https://pytorch.org/get-started/locally/
+
 ---
 
 ## 🪟 Windows
@@ -70,8 +72,10 @@ Extract it and follow the instructions for your platform.
 
 ```powershell
 cd path_to_extracted_rag_project
+
 pip install -r requirements.txt
-python -m RAG.pipeline
+
+python -m RAG.apps.cli
 ```
 
 ---
@@ -84,10 +88,13 @@ python -m RAG.pipeline
 
 ```bash
 cd path_to_extracted_rag_project
-pip install -r requirements.txt \
-&& python -m RAG.pipeline
+
+pip install -r requirements.txt
+
+python -m RAG.apps.cli
 ```
 ---
+
 
 # ⚙️ Pipeline Architecture
 
@@ -336,15 +343,4 @@ docs\pllum.txt | chunk: 125
 ```
 
 ---
-
-### ⚠️ Current Limitations
-
-The project **currently does not include a graphical user interface (GUI)**.
-
-If you want to modify:
-
-* **Queries** → edit them directly in `pipeline.py`
-* **Knowledge base** → modify the files inside the `docs/` directory
-
-This will be **improved in future versions** to allow easier configuration and interaction.
 

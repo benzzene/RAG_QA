@@ -3,7 +3,7 @@ import re
 import unicodedata
 from rank_bm25 import BM25Okapi
 from typing import List, Any, Tuple
-from langchain.schema import Document
+from langchain_core.documents import Document
 
 _token_re = re.compile(r"\w+", flags=re.UNICODE)
 

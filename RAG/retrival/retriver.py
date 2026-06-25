@@ -2,7 +2,7 @@ from RAG.retrival.bm25 import BM25
 from RAG.retrival.dense import DenseSearch
 from RAG.retrival.rrf import RRF
 from typing import List, Dict, Any
-from langchain.schema import Document
+from langchain_core.documents import Document
 from dataclasses import dataclass
 
 @dataclass

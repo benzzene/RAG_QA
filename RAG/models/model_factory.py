@@ -28,7 +28,7 @@ def make_model(cfg: Mapping[str, Any]) -> QwenModel:
     Returns:
         QwenModel: A fully initialized Qwen model with tokenizer and configs.
     """
-    # 1) initialization
+
     init_cfg = QwenInitConfig(
         model_id=cfg.get("model_id", QwenInitConfig.model_id),
         device=cfg.get("device", "cuda"),
@@ -39,7 +39,6 @@ def make_model(cfg: Mapping[str, Any]) -> QwenModel:
         system_prompt=cfg.get("system_prompt", QwenInitConfig.system_prompt)
     )
 
-    # 2) generation parameters
     gen_cfg = QwenGenConfig(
         max_new_tokens=cfg.get("max_new_tokens", QwenGenConfig.max_new_tokens),
         temperature=cfg.get("temperature", QwenGenConfig.temperature),

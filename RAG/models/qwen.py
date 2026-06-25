@@ -164,32 +164,29 @@ class QwenModel:
         context_block = self.format_context(ctxs)
         user_prompt = (
             f"CONTEXT:\n{context_block}\n\n"
-            f"Zadanie: Odpowiedz na pytanie wyłącznie na podstawie powyższego kontekstu.\n"
-            f"QUESTION: {query}\n"
-            f"Odpowiedź po polsku. Jeśli brak danych w kontekście, powiedz to wprost."
+            f"QUESTION:\n{query}\n\n"
         )
         return [
             {"role": "system", "content": self.init_cfg.system_prompt},
             {"role": "user", "content": user_prompt},
         ]
 
-
-    def _encode_messages(self, messages: List[Dict[str, str]]):
+    def _encode_messages(self, messages: List[Dict[str, str]]) -> torch.Tensor:
         """Encodes chat messages into model input tensors.
 
-        Args:
-            messages (List[Dict[str, str]]): Chat messages (system and user).
+        Args: messages (List[Dict[str, str]]): Chat messages (system and user).
 
-        Returns:
-            torch.Tensor: Tokenized input IDs ready for the model.
+        Returns: torch.Tensor: Tokenized input IDs ready for the model.
         """
-        input_ids = self.tokenizer.apply_chat_template(
+        encoded = self.tokenizer.apply_chat_template(
             messages,
             tokenize=True,
             add_generation_prompt=True,
             return_tensors="pt",
+            return_dict=True,
         ).to(self.model.device)
-        return input_ids
+
+        return encoded["input_ids"]
 
     @torch.inference_mode()
     def generate_from_messages(
@@ -212,7 +209,7 @@ class QwenModel:
 
         outputs = self.model.generate(
             input_ids=input_ids,
-            **cfg.to_dict(),
+            generation_config=cfg,
         )
         gen_ids = outputs[0, input_ids.shape[-1]:]
         return self.tokenizer.decode(gen_ids, skip_special_tokens=True).strip()

@@ -1,0 +1,60 @@
+index:
+  docs_dir: docs
+  index_path: data/index.faiss
+  chunks_path: data/chunks.jsonl
+  show_progress: true
+  splitter:
+    chunk_size: 1000
+    chunk_overlap: 200
+  embeddings:
+    provider: hf
+    model: BAAI/bge-m3
+    device: cuda
+    normalize: true
+    batch_size: 32
+    similarity_metric: cosine
+  store:
+    provider: faiss_flat
+    device: cpu
+    gpu_id: 0
+
+runtime:
+  index_path: data/index.faiss
+  chunks_path: data/chunks.jsonl
+  build_if_missing: true
+  embeddings:
+    provider: hf
+    model: BAAI/bge-m3
+    device: cuda
+    normalize: true
+    batch_size: 32
+    similarity_metric: cosine
+  retriever:
+    k_bm25: 60
+    k_dense: 60
+    topn: 40
+  reranker:
+    model_name: BAAI/bge-reranker-v2-m3
+    device: cuda
+    max_length: 512
+    k_final: 10
+    batch_size: 32
+  llm:
+    provider: qwen
+    model_id: Qwen/Qwen2.5-7B-Instruct
+    device: cuda
+    use_4bit: true
+    system_prompt: >-
+      You are a Retrieval-Augmented Generation assistant.
+      Answer exclusively using the provided context.
+      Never invent facts that are not supported by the context.
+      If the context is insufficient, explicitly state that the answer cannot be determined.
+      Cite sources whenever possible.
+      Respond in the same language as the user's question.
+    max_context_chars: 12000
+    max_new_tokens: 512
+    temperature: 0.2
+    top_p: 0.9
+    do_sample: true
+    repetition_penalty: 1.1
+

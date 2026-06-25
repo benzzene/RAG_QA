@@ -27,7 +27,7 @@ Pobierz kod źródłowy do archiwum `.zip`
    ```powershell
    cd ścieżka_do_rozpakowanego_rag_project
    pip install -r requirements.txt
-   python -m RAG.pipeline
+   python -m RAG.apps.cli
 
 #### Linux
 1. Rozpakuj archiwum `RAQ_QA.zip`.  
@@ -35,7 +35,7 @@ Pobierz kod źródłowy do archiwum `.zip`
    ```bash
    cd ścieżka_do_rozpakowanego_rag_project
    pip install -r requirements.txt \
-   && python -m RAG.pipeline
+   && python -m RAG.apps.cli
 
 ## Przykładowe odpowiedzi
 ### 1. Jakie modele LLaMa są dostępne?

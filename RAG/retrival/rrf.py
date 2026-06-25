@@ -1,7 +1,7 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import List, Tuple, Dict, Any
-from langchain.schema import Document
+from langchain_core.documents import Document
 
 @dataclass
 class Retrieved:
