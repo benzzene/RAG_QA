@@ -8,6 +8,7 @@ import numpy as np
 from RAG.config import IndexConfig
 from RAG.io.loaders import DirectoryDocumentLoader, LoaderConfig
 from RAG.io.splitters import RecursiveSplitter, SplitterConfig
+from RAG.indexing.build_manifest import build_manifest, save_manifest
 from RAG.indexing.embeddings.embeddings_factory import create_embeddings
 from RAG.indexing.vector_store.IndexStore_factory import create_indexstore
 
@@ -64,6 +65,8 @@ def build_index(cfg: IndexConfig) -> None:
     store.add_with_ids(vectors, ids)
 
     Path(cfg.index_path).parent.mkdir(parents=True, exist_ok=True)
+    Path(cfg.chunks_path).parent.mkdir(parents=True, exist_ok=True)
+    Path(cfg.manifest_path).parent.mkdir(parents=True, exist_ok=True)
 
     store.save(cfg.index_path)
 
@@ -75,6 +78,10 @@ def build_index(cfg: IndexConfig) -> None:
             }
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
 
+    manifest = build_manifest(cfg)
+    save_manifest(cfg.manifest_path, manifest)
+
     print(f"Saved index to: {cfg.index_path}")
     print(f"Saved chunks to: {cfg.chunks_path}")
+    print(f"Saved manifest to: {cfg.manifest_path}")
     print(f"Indexed chunks: {len(chunks)}")

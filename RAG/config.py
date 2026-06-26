@@ -45,6 +45,7 @@ class IndexConfig(BaseModel):
     docs_dir: str = "docs"
     index_path: str = "data/index.faiss"
     chunks_path: str = "data/chunks.jsonl"
+    manifest_path: str = "data/manifest.json"
     show_progress: bool = True
     splitter: SplitterConfigModel = Field(default_factory=SplitterConfigModel)
     embeddings: EmbeddingsConfigModel = Field(default_factory=EmbeddingsConfigModel)

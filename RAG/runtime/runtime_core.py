@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -10,6 +11,7 @@ from RAG.config import AppConfig, RuntimeConfig
 from RAG.indexing.build_index import build_index
 from RAG.indexing.embeddings.embeddings_factory import create_embeddings
 from RAG.indexing.vector_store.faiss_index import FaissFlatStore
+from RAG.indexing.build_manifest import build_manifest, load_manifest, manifest_diff
 from RAG.models.model_factory import make_model
 from RAG.reranker.cross_encoder import CrossEncoderReranker
 from RAG.retrival.bm25 import BM25
@@ -18,16 +20,70 @@ from RAG.retrival.retriver import Retrieved, Retriever
 from RAG.retrival.rrf import RRF
 
 
-def ensure_index_assets(cfg: AppConfig) -> None:
+@dataclass(frozen=True)
+class IndexAssetsState:
+    index_exists: bool
+    chunks_exists: bool
+    manifest_exists: bool
+    manifest_diff: list[str]
+
+    @property
+    def assets_missing(self) -> bool:
+        return not self.index_exists or not self.chunks_exists
+
+    @property
+    def manifest_missing(self) -> bool:
+        return not self.manifest_exists
+
+    @property
+    def sources_changed(self) -> bool:
+        return bool(self.manifest_diff)
+
+    @property
+    def needs_rebuild(self) -> bool:
+        return self.assets_missing or self.manifest_missing or self.sources_changed
+
+
+def inspect_index_assets(cfg: AppConfig) -> IndexAssetsState:
+    """
+    Inspect index assets and compare the saved manifest with the current state.
+
+    This function does not build or modify anything. It is intended for CLI/API
+    flows that need to tell the user whether the index is missing or outdated.
+    """
     index_path = Path(cfg.runtime.index_path)
     chunks_path = Path(cfg.runtime.chunks_path)
+    manifest_path = Path(cfg.index.manifest_path)
 
-    if index_path.exists() and chunks_path.exists():
+    current_manifest = build_manifest(cfg.index)
+    saved_manifest = load_manifest(manifest_path)
+
+    return IndexAssetsState(
+        index_exists=index_path.exists(),
+        chunks_exists=chunks_path.exists(),
+        manifest_exists=manifest_path.exists(),
+        manifest_diff=manifest_diff(saved_manifest, current_manifest),
+    )
+
+
+def ensure_index_assets(cfg: AppConfig) -> None:
+    """
+    Ensure required runtime assets exist.
+
+    This function only builds the index when required runtime files are missing
+    and runtime.build_if_missing is enabled. It does not rebuild the index only
+    because source documents changed; that decision should be handled by CLI/API.
+    """
+    state = inspect_index_assets(cfg)
+
+    if not state.assets_missing:
         return
 
     if not cfg.runtime.build_if_missing:
         raise FileNotFoundError(
-            f"Missing runtime assets: {index_path} or {chunks_path}. "
+            "Missing runtime assets: "
+            f"index_exists={state.index_exists}, "
+            f"chunks_exists={state.chunks_exists}. "
             "Enable runtime.build_if_missing or build the index first."
         )
 

@@ -2,6 +2,7 @@ index:
   docs_dir: docs
   index_path: data/index.faiss
   chunks_path: data/chunks.jsonl
+  manifest_path: data/manifest.json
   show_progress: true
   splitter:
     chunk_size: 1000
